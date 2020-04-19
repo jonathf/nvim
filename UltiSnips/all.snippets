@@ -1,0 +1,133 @@
+# This file contains snippets that are always defined. I personally
+# have snippets for signatures and often needed texts
+
+# sligthly lower priority than everything else since specialized versions
+# should overwrite. The user needs to adjust her priority in her snippets to
+# ~-55 so that other filetypes will still overwrite.
+priority -60
+
+##############
+# NICE BOXES #
+##############
+global !p
+import string, vim, os
+from datetime import datetime
+
+now = datetime.now()
+
+""" Maps a filetype to comment format used for boxes.
+Automatically filled during usage"""
+_commentDict = { }
+
+def _parse_comments(s):
+	""" Parses vim's comments option to extract comment format """
+	i = iter(s.split(","))
+
+	rv = []
+	try:
+		while True:
+			# get the flags and text of a comment part
+			flags, text = next(i).split(':', 1)
+
+			if len(flags) == 0:
+				rv.append((text, text, text, ""))
+			# parse 3-part comment, but ignore those with O flag
+			elif 's' in flags and 'O' not in flags:
+				ctriple = []
+				indent = ""
+
+				if flags[-1] in string.digits:
+					indent = " " * int(flags[-1])
+				ctriple.append(text)
+
+				flags,text = next(i).split(':', 1)
+				assert(flags[0] == 'm')
+				ctriple.append(text)
+
+				flags,text = next(i).split(':', 1)
+				assert(flags[0] == 'e')
+				ctriple.append(text)
+				ctriple.append(indent)
+
+				rv.append(ctriple)
+			elif 'b' in flags:
+				if len(text) == 1:
+					rv.insert(0, (text,text,text, ""))
+	except StopIteration:
+		return rv
+
+def _get_comment_format():
+	""" Returns a 4-element tuple representing the comment format for
+	the current file. """
+	return _parse_comments(vim.eval("&comments"))[0]
+
+
+def make_box(twidth, bwidth=None):
+	b, m, e, i = _get_comment_format()
+	bwidth_inner = bwidth - 3 - max(len(b), len(i + e)) if bwidth else twidth + 2
+	sline = b + m + bwidth_inner * m[0] + 2 * m[0]
+	nspaces = (bwidth_inner - twidth) // 2
+	mlines = i + m + " " + " " * nspaces
+	mlinee = " " + " "*(bwidth_inner - twidth - nspaces) + m
+	eline = i + m + bwidth_inner * m[0] + 2 * m[0] + e
+	return sline, mlines, mlinee, eline
+
+def foldmarker():
+	"Return a tuple of (open fold marker, close fold marker)"
+	return vim.eval("&foldmarker").split(",")
+
+def pathverify(snip):
+	match = re.findall(
+	    r"[\.~]?/[a-zA-Z0-9_/]+$",
+	    snip.buffer[snip.line][:snip.column+1]
+	)
+	if match:
+		return os.path.isdir(match[0])
+	return False
+endglobal
+
+
+snippet "<t_ü> *" "tab" r
+
+endsnippet
+
+pre_expand "snip.buffer[snip.line] = snip.buffer[snip.line][:1]*len(snip.buffer[snip.line-1]); snip.cursor.set(snip.line, len(snip.buffer[snip.line]))"
+snippet "(^[^a-zA-Z0-9 \"])\1+" "underline" br
+endsnippet
+
+snippet "\.?\/[\w\d_/]+" "path expand" "pathverify(snip)" re
+`!p snip.rv=match.group(0)`/
+endsnippet
+
+snippet "20(\d\d?)?" "month" wr
+`!p snip.rv="{}-{:02}".format(now.year, now.month)`
+endsnippet
+priority -58
+snippet "20\d\d-\d\d" "day" rw
+`!p snip.rv=(
+	"{}-{}".format(match.group(0), now.day)
+	if "{}-{:02}".format(now.year, now.month) == match.group(0)
+	else "{}-{:02}".format(now.year, now.month)
+)`
+endsnippet
+priority -59
+snippet "20\d\d-\d\d-\d\d" "minute" rw
+`!p snip.rv=(
+	"{} {:02}:{:02}".format(match.group(0), now.hour, now.minute)
+	if "{}-{:02}-{:02}".format(now.year, now.month, now.day) == match.group(0)
+	else "{}-{:02}-{:02}".format(now.year, now.month, now.day)
+)`
+endsnippet
+priority -60
+snippet "TODO|DONE" "" wr
+`!p snip.rv={"TODO": "DONE", "DONE": "TODO"}[match.group(0)]`
+endsnippet
+
+# #lowest on the foodchain
+# priority -9000
+#
+# snippet "^(.*[^ ])? +" "default" br
+# `!p snip.rv=match.group(0) + " "*(4-(len(match.group(0)) % 4))`
+# endsnippet
+
+# vim:ft=snippets:
