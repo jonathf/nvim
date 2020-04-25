@@ -31,7 +31,7 @@ set splitright                  " make splits on right side
 set tabstop=4                   " number of spaces in a tab
 set tags^=./.git/tags;
 set textwidth=79                " generate newline at col
-set undodir=~/cfg/vim/shada/undo
+set undodir=~/.config/nvim/shada/undo
 set undofile
 set updatetime=100
 set wildignore=.dll,.o,.obj,.bak,.pyc,.pdf,.png,.jpg,.pkl,.xz
