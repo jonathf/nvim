@@ -11,6 +11,15 @@ To install, follow the steps:
 
        sudo pacman --sync --refresh --noconfirm neovim ctags xsel
 
+   If installation is an issue, Neovim can be installed as an universal Linux
+   AppImage:
+
+   .. code:: bash
+
+       curl -LO https://github.com/neovim/neovim/releases/download/stable/nvim.appimage
+       chmod u+x nvim.appimage
+       mv nvim.appimage ~/.local/bin/nvim
+
 2. Clone the repository into the neovim configuration folder:
 
    .. code:: bash
