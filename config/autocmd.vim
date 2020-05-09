@@ -1,5 +1,5 @@
 " store backup files to individual files
-autocmd BufWritePre * let &bext='-'.strftime("%y%m%d-%H%M")
+autocmd BufWritePre * let &backupext='-'.strftime("%y%m%d-%H%M")
 
 autocmd CmdwinEnter * nnoremap <esc> :q<cr>
 autocmd CmdwinLeave * nunmap <esc>

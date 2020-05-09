@@ -38,8 +38,8 @@ nnoremap <silent> æ :silent exec ':cd '.fnamemodify(expand('%'), ':h')<cr>
 nmap <silent> Æ :vs<cr>æ
 tmap <silent> æ <c-\><c-n>æ
 
-nnoremap ø :edit term://fish<cr>
-nnoremap Ø :vsplit term://fish<cr>
+nnoremap ø :edit term://$SHELL<cr>
+nnoremap Ø :vsplit term://$SHELL<cr>
 
 " stuff I like
 nnoremap D :quit<cr>
