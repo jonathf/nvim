@@ -10,5 +10,3 @@ autocmd FileType vim-plug setlocal nospell
 
 autocmd CmdlineEnter /,\? set hlsearch
 autocmd CmdlineLeave /,\? set nohlsearch
-
-autocmd BufLeave *.* :silent! !set --universal (nvim_id) "%:p"
